@@ -1,0 +1,35 @@
+Direct Code Injection of Linux ELF Executable File 
+
+=== INTRODUCTION ===
+
+The included code snippets demonstrate an approach to inject compiled code fragment 
+directly into ELF binary executable file to be called when the executable file is invoked.
+
+=== SOURCE CODE & API ===
+
+installer.S
+ The code to be injected 
+ 
+hook.c
+ ApiHook_Init(char *)
+	- read the ELF file and load into memory file's section header information
+   
+ ApiHook_InstallHooker(void)
+	- read in-memory section header information
+	- inject code from installer.S
+	
+ ApiHook_SymbolRelo(char *)	
+    - translate symbol's file offset with respect to the beginning of a file into 
+	  the memory offset after the file is loaded in memory for execution.
+	  
+ ApiHook_ElfHdrCheck(char *)
+	- file format consistency check, to make sure the file conforms to ELF format.
+	
+=== TESTING ===
+	
+reader.c
+  reads the modified ELF file and output injected code location.
+
+=== BUILD ===
+gcc -o api installer.S hook.c
+gcc -o check reader.c
